@@ -1,7 +1,7 @@
 import React from 'react'
 import { Provider } from 'react-redux'
 import { createBottomTabNavigator, createSwitchNavigator, createAppContainer } from 'react-navigation'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import { FontAwesome } from '@expo/vector-icons'
 import store from './redux/store'
 
 import HomeScreen from './screens/HomeScreen'

@@ -1,5 +1,7 @@
 import React from 'react'
 import { View, AsyncStorage, ImageBackground, ActivityIndicator, Alert, StyleSheet } from 'react-native'
+import { FontAwesome } from '@expo/vector-icons'
+import { Asset, Font } from 'expo'
 import { handleLogin, queryUserId, fetchList } from '../api'
 import { updateList, updateUser } from '../redux/actions'
 import { connect } from 'react-redux'
@@ -10,7 +12,35 @@ let accessToken = null
 class LoadingScreen extends React.Component {
 
   componentDidMount() {
+    this.cacheAssets()
     this.retrieveData()
+  }
+
+  cacheImages(images) {
+    return images.map(image => {
+      if (typeof image === 'string') {
+        return Image.prefetch(image);
+      } else {
+        return Asset.fromModule(image).downloadAsync();
+      }
+    });
+  }
+
+  cacheFonts(fonts) {
+    return fonts.map(font => Font.loadAsync(font));
+  }
+
+  cacheAssets = async () => {
+    const imageAssets = this.cacheImages([
+      require('../assets/hulu_icon.png'),
+      require('../assets/crunchyroll_icon.jpg'),
+      require('../assets/netflix_icon.png'),
+      require('../assets/hidive_icon.jpg'),
+      require('../assets/funi_icon.jpg'),
+      require('../assets/prime_icon.png'),
+    ]);
+    const fontAssets = this.cacheFonts([FontAwesome.font])
+    await Promise.all([...imageAssets, ...fontAssets])
   }
 
   retrieveData = async () => {

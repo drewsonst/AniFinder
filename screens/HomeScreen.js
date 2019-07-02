@@ -1,7 +1,7 @@
 import React from 'react'
 import { Linking, ActivityIndicator, View, StyleSheet } from 'react-native'
 import { connect } from 'react-redux'
-import { fetchList, addProgress } from '../api'
+import { fetchList, addProgress, changeList } from '../api'
 import { updateList } from '../redux/actions'
 import AnimeSectionList from '../AnimeSectionList'
 
@@ -20,7 +20,7 @@ class HomeScreen extends React.Component {
     this.setState({ updating: true })
     let found = this.props.watching.find(item => (item.id === id))
     let progress, status
-    if (dismiss) {
+    if (dismiss) { //set the progress to the max episode
       progress = found.media.nextAiringEpisode
         ? found.media.nextAiringEpisode.episode - 1
         : found.media.episodes === null
@@ -41,6 +41,14 @@ class HomeScreen extends React.Component {
     Linking.openURL(url).catch((err) => console.error('An error occurred', err))
   }
 
+  changeList = async (status, id) => {
+    this.setState({ updating: true })
+    await changeList(this.props.user.accessToken, id, status)
+    const showList = await fetchList(this.props.user.userId)
+    this.props.updateList(showList)
+    this.setState({ updating: false })
+  }
+
   render() {
     return (
       <View style={styles.container}>
@@ -52,6 +60,7 @@ class HomeScreen extends React.Component {
         <AnimeSectionList
           addProgress={this.addProgress}
           openPage={this.openPage}
+          changeList={this.changeList}
           refresh={this.fetchListAsync}
           firstTitle='Watching'
           first={this.props.watching}
